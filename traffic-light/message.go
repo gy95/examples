@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/kubeedge/kubeedge/cloud/pkg/apis/devices/v1alpha2"
 	"io/ioutil"
 	"log"
 	"os"
@@ -136,28 +137,33 @@ func InitCLient() MQTT.Client {
 
 func OperateUpdateDetalSub(c MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Receive msg topic %s %v\n\n", msg.Topic(), string(msg.Payload()))
-	current := &dttype.DeviceTwinUpdate{}
+	current := &v1alpha2.DeviceStatus{}
 	if err := json.Unmarshal(msg.Payload(), current); err != nil {
 		fmt.Printf("unmarshl receive msg DeviceTwinUpdate{} to error %v\n", err)
 		return
 	}
-	value := *(current.Twin[RED_STATE].Expected.Value)
-	if LedState(red_wpi_num) != value {
-		if err := Set(red_wpi_num, value); err != nil {
-			fmt.Printf("Set Red light to %v error %v", value, err)
-		}
-	}
-
-	value = *(current.Twin[YELLOW_STATE].Expected.Value)
-	if LedState(yellow_wpi_num) != value {
-		if err := Set(yellow_wpi_num, value); err != nil {
-			fmt.Printf("Set Yellow light to %v error %v", value, err)
-		}
-	}
-	value = *(current.Twin[GREEN_STATE].Expected.Value)
-	if LedState(green_wpi_num) != value {
-		if err := Set(green_wpi_num, value); err != nil {
-			fmt.Printf("Set Green light to %v error %v", value, err)
+	for _, twin := range current.Twins {
+		if twin.PropertyName == RED_STATE {
+			value := twin.Desired.Value
+			if LedState(red_wpi_num) != value {
+				if err := Set(red_wpi_num, value); err != nil {
+					fmt.Printf("Set Red light to %v error %v", value, err)
+				}
+			}
+		} else if twin.PropertyName == YELLOW_STATE {
+			value := twin.Desired.Value
+			if LedState(yellow_wpi_num) != value {
+				if err := Set(yellow_wpi_num, value); err != nil {
+					fmt.Printf("Set Yellow light to %v error %v", value, err)
+				}
+			}
+		} else if twin.PropertyName == GREEN_STATE {
+			value := twin.Desired.Value
+			if LedState(green_wpi_num) != value {
+				if err := Set(green_wpi_num, value); err != nil {
+					fmt.Printf("Set Green light to %v error %v", value, err)
+				}
+			}
 		}
 	}
 }
@@ -200,6 +206,7 @@ func UpdateActualDeviceStatus() {
 	for {
 		act := CreateActualDeviceStatus(LedState(red_wpi_num), LedState(yellow_wpi_num), LedState(green_wpi_num))
 
+		fmt.Printf("begin to update twin")
 		//twinUpdateBody, err := json.MarshalIndent(act, "", "	")
 		twinUpdateBody, err := json.Marshal(act)
 		if err != nil {
@@ -212,7 +219,7 @@ func UpdateActualDeviceStatus() {
 
 		//fmt.Printf("update deviceTwin %++v\n", string(twinUpdateBody))
 
-		time.Sleep(time.Second * 3)
+		time.Sleep(time.Second * 3000)
 	}
 
 }

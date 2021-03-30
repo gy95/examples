@@ -7,7 +7,7 @@ import (
 // DeviceProfile is structure to store in configMap. These types would be consumed by mappers to marshal / unmarshal the device profile json
 type DeviceProfile struct {
 	// DeviceInstances is used to store list of all devices.
-	DeviceInstances []*DeviceInstance `json:"deviceInstances,omitempty"`
+	DeviceInstances []*v1alpha2.Device `json:"deviceInstances,omitempty"`
 	// DeviceModels is used to store list of all DeviceModels referenced by DeviceInstances
 	DeviceModels []*DeviceModel `json:"deviceModels,omitempty"`
 	// Protocols is list of all protocols used by DeviceInstances

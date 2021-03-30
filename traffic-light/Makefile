@@ -4,7 +4,7 @@
 default: image
 
 image: bin
-	docker build -t kubeedge/traffic-light:arm32-v1 .
+	docker build -t kubeedge/traffic-light:update .
 
 .PHONY: bin
 bin:
