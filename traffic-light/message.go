@@ -215,11 +215,12 @@ func UpdateActualDeviceStatus() {
 	//r .y. g
 
 	// topic contains namespace
-	deviceTwinUpdate := DeviceETPrefix + "default/" + deviceID + TwinETUpdateSuffix
+	//deviceTwinUpdate := DeviceETPrefix + "default/" + deviceID + TwinETUpdateSuffix
+	deviceTwinUpdate := DeviceETPrefix + deviceID + TwinETUpdateSuffix
 	for {
 		act := CreateActualDeviceStatus(LedState(red_wpi_num), LedState(yellow_wpi_num), LedState(green_wpi_num))
 
-		fmt.Println("begin to update twin")
+		fmt.Println("begin to update twin, topic is ", deviceTwinUpdate)
 		//twinUpdateBody, err := json.MarshalIndent(act, "", "	")
 		twinUpdateBody, err := json.Marshal(act)
 		if err != nil {
