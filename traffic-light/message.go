@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -138,81 +137,46 @@ func InitCLient() MQTT.Client {
 	return Client
 }
 
-// this structure is used not only for cloud, but also for edge, so put here temporarily
-type DeviceTransmitMsg struct {
-	//BaseMessage BaseMessage
-	// TODO: if need slice, i find only one device will be added or removed per one time
-	// todo: update/add device all use this structure, considering add a method
-	DeviceAdded v1alpha2.Device
-	DeviceRemoved v1alpha2.Device
-	// todo: consider move DeviceUpdated to other structure
-	DeviceUpdated v1alpha2.Device
+//DeviceTwinDelta devicetwin
+type DeviceTwinDelta struct {
+	Twin  map[string]v1alpha2.Twin `json:"twin"`
+	Delta map[string]string   `json:"delta"`
+	// consider use slice instead of map ??? for uniform
 }
 
 func OperateUpdateDetalSub(c MQTT.Client, msg MQTT.Message) {
 	fmt.Println("Receive msg topic %s %v\n\n", msg.Topic(), string(msg.Payload()))
-	//current := &v1alpha2.DeviceStatus{}
-	current := &DeviceTransmitMsg{}
+	// current := &dttype.DeviceTwinUpdate{}
+
+	current := &DeviceTwinDelta{}
+	//current := &DeviceTransmitMsg{}
 	if err := json.Unmarshal(msg.Payload(), current); err != nil {
 		fmt.Println("unmarshl receive msg DeviceTwinUpdate{} to error %v\n", err)
 		return
 	}
-	//fmt.Println("hhhhhhh")
-	//fmt.Println("revceive msg is %v", current)
-	twins := []v1alpha2.Twin{}
-	if !reflect.DeepEqual(&current.DeviceAdded, &v1alpha2.Device{}) {
-		twins = current.DeviceAdded.Status.Twins
-		fmt.Println("added twin")
-	} else if !reflect.DeepEqual(&current.DeviceUpdated, &v1alpha2.Device{}) {
-		twins = current.DeviceUpdated.Status.Twins
-		fmt.Println("update twin")
-	} else if !reflect.DeepEqual(&current.DeviceRemoved, &v1alpha2.Device{}) {
-		twins = current.DeviceRemoved.Status.Twins
-		fmt.Println("delete twin")
+
+	fmt.Println("current is ", current)
+	value := current.Twin[RED_STATE].Desired.Value
+	fmt.Println("red value is %s", value)
+	if LedState(red_wpi_num) != value {
+		if err := Set(red_wpi_num, value); err != nil {
+			fmt.Println("Set Red light to %v error %v", value, err)
+		}
 	}
 
-	if !reflect.DeepEqual(current.DeviceAdded, v1alpha2.Device{}) {
-		twins = current.DeviceAdded.Status.Twins
-		fmt.Println("added twin hhhhhhh")
-	} else if !reflect.DeepEqual(current.DeviceUpdated, v1alpha2.Device{}) {
-		twins = current.DeviceUpdated.Status.Twins
-		fmt.Println("update twin hhhhhhhhhhh")
-	} else if !reflect.DeepEqual(current.DeviceRemoved, v1alpha2.Device{}) {
-		twins = current.DeviceRemoved.Status.Twins
-		fmt.Println("delete twin hhhhhhhhhhhhhhhh")
+	value = current.Twin[YELLOW_STATE].Desired.Value
+	fmt.Println("yellow value is %s", value)
+	if LedState(yellow_wpi_num) != value {
+		if err := Set(yellow_wpi_num, value); err != nil {
+			fmt.Println("Set Yellow light to %v error %v", value, err)
+		}
 	}
 
-	fmt.Println("current.DeviceAdded is : ", current.DeviceAdded)
-	fmt.Println("current.DeviceUpdated is : ", current.DeviceUpdated)
-	fmt.Println("current.DeviceRemoved is : ", current.DeviceRemoved)
-	fmt.Println("--------------------------------------------")
-	fmt.Println("after parsed, twins become %v", twins)
-	fmt.Println("--------------------------------------------")
-	for _, twin := range twins {
-		if twin.PropertyName == RED_STATE {
-			value := twin.Desired.Value
-			fmt.Println("red value is %s", value)
-			if LedState(red_wpi_num) != value {
-				if err := Set(red_wpi_num, value); err != nil {
-					fmt.Println("Set Red light to %v error %v", value, err)
-				}
-			}
-		} else if twin.PropertyName == YELLOW_STATE {
-			value := twin.Desired.Value
-			fmt.Println("yellow value is %s", value)
-			if LedState(yellow_wpi_num) != value {
-				if err := Set(yellow_wpi_num, value); err != nil {
-					fmt.Println("Set Yellow light to %v error %v", value, err)
-				}
-			}
-		} else if twin.PropertyName == GREEN_STATE {
-			value := twin.Desired.Value
-			fmt.Println("green value is %s", value)
-			if LedState(green_wpi_num) != value {
-				if err := Set(green_wpi_num, value); err != nil {
-					fmt.Println("Set Green light to %v error %v", value, err)
-				}
-			}
+	value = current.Twin[GREEN_STATE].Desired.Value
+	fmt.Println("green value is %s", value)
+	if LedState(green_wpi_num) != value {
+		if err := Set(green_wpi_num, value); err != nil {
+			fmt.Println("Set Green light to %v error %v", value, err)
 		}
 	}
 }
