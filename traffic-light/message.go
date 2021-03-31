@@ -110,7 +110,7 @@ func loadConfigMap() error {
 			}
 		}
 	}
-	fmt.Printf("Finally get wpi pin number from configmap: red %d yellow %d green %d\n",
+	fmt.Println("Finally get wpi pin number from configmap: red %d yellow %d green %d\n",
 		red_wpi_num, yellow_wpi_num, green_wpi_num)
 
 	SetOutput(red_wpi_num)
@@ -127,7 +127,7 @@ func InitCLient() MQTT.Client {
 		opts = opts.SetOnConnectHandler(func(c MQTT.Client) {
 			//topic := DeviceETPrefix + deviceID + TwinETUpdateDetalSuffix
 			topic := DeviceETPrefix + "default" + "/" + deviceID + TwinETUpdateDetalSuffix
-			fmt.Printf("deviceID is %s", deviceID)
+			fmt.Println("deviceID is %s", deviceID)
 			if token := c.Subscribe(topic, 0, OperateUpdateDetalSub); token.Wait() && token.Error() != nil {
 				fmt.Println("subscribe: ", token.Error())
 				os.Exit(1)
@@ -150,15 +150,15 @@ type DeviceTransmitMsg struct {
 }
 
 func OperateUpdateDetalSub(c MQTT.Client, msg MQTT.Message) {
-	fmt.Printf("Receive msg topic %s %v\n\n", msg.Topic(), string(msg.Payload()))
+	fmt.Println("Receive msg topic %s %v\n\n", msg.Topic(), string(msg.Payload()))
 	//current := &v1alpha2.DeviceStatus{}
 	current := &DeviceTransmitMsg{}
 	if err := json.Unmarshal(msg.Payload(), current); err != nil {
-		fmt.Printf("unmarshl receive msg DeviceTwinUpdate{} to error %v\n", err)
+		fmt.Println("unmarshl receive msg DeviceTwinUpdate{} to error %v\n", err)
 		return
 	}
-	fmt.Printf("hhhhhhh")
-	fmt.Printf("revceive msg is %v", current)
+	fmt.Println("hhhhhhh")
+	fmt.Println("revceive msg is %v", current)
 	twins := []v1alpha2.Twin{}
 	if !reflect.DeepEqual(current.DeviceAdded, v1alpha2.Device{}) {
 		twins = current.DeviceAdded.Status.Twins
@@ -167,30 +167,30 @@ func OperateUpdateDetalSub(c MQTT.Client, msg MQTT.Message) {
 	} else if !reflect.DeepEqual(current.DeviceUpdated, v1alpha2.Device{}) {
 		twins = current.DeviceRemoved.Status.Twins
 	}
-	fmt.Printf("after parsed, twins become %v", twins)
+	fmt.Println("after parsed, twins become %v", twins)
 	for _, twin := range twins {
 		if twin.PropertyName == RED_STATE {
 			value := twin.Desired.Value
-			fmt.Printf("red value is %s", value)
+			fmt.Println("red value is %s", value)
 			if LedState(red_wpi_num) != value {
 				if err := Set(red_wpi_num, value); err != nil {
-					fmt.Printf("Set Red light to %v error %v", value, err)
+					fmt.Println("Set Red light to %v error %v", value, err)
 				}
 			}
 		} else if twin.PropertyName == YELLOW_STATE {
 			value := twin.Desired.Value
-			fmt.Printf("yellow value is %s", value)
+			fmt.Println("yellow value is %s", value)
 			if LedState(yellow_wpi_num) != value {
 				if err := Set(yellow_wpi_num, value); err != nil {
-					fmt.Printf("Set Yellow light to %v error %v", value, err)
+					fmt.Println("Set Yellow light to %v error %v", value, err)
 				}
 			}
 		} else if twin.PropertyName == GREEN_STATE {
 			value := twin.Desired.Value
-			fmt.Printf("green value is %s", value)
+			fmt.Println("green value is %s", value)
 			if LedState(green_wpi_num) != value {
 				if err := Set(green_wpi_num, value); err != nil {
-					fmt.Printf("Set Green light to %v error %v", value, err)
+					fmt.Println("Set Green light to %v error %v", value, err)
 				}
 			}
 		}
@@ -235,7 +235,7 @@ func UpdateActualDeviceStatus() {
 	for {
 		act := CreateActualDeviceStatus(LedState(red_wpi_num), LedState(yellow_wpi_num), LedState(green_wpi_num))
 
-		fmt.Printf("begin to update twin")
+		fmt.Println("begin to update twin")
 		//twinUpdateBody, err := json.MarshalIndent(act, "", "	")
 		twinUpdateBody, err := json.Marshal(act)
 		if err != nil {
@@ -246,7 +246,7 @@ func UpdateActualDeviceStatus() {
 			log.Fatalf("client.publish() Error in device twin update is %v", token.Error())
 		}
 
-		//fmt.Printf("update deviceTwin %++v\n", string(twinUpdateBody))
+		//fmt.Println("update deviceTwin %++v\n", string(twinUpdateBody))
 
 		time.Sleep(time.Second * 3000)
 	}
