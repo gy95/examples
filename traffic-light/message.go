@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -135,16 +136,40 @@ func InitCLient() MQTT.Client {
 	return Client
 }
 
+// this structure is used not only for cloud, but also for edge, so put here temporarily
+type DeviceTransmitMsg struct {
+	//BaseMessage BaseMessage
+	// TODO: if need slice, i find only one device will be added or removed per one time
+	// todo: update/add device all use this structure, considering add a method
+	DeviceAdded v1alpha2.Device
+	DeviceRemoved v1alpha2.Device
+	// todo: consider move DeviceUpdated to other structure
+	DeviceUpdated v1alpha2.Device
+}
+
 func OperateUpdateDetalSub(c MQTT.Client, msg MQTT.Message) {
 	fmt.Printf("Receive msg topic %s %v\n\n", msg.Topic(), string(msg.Payload()))
-	current := &v1alpha2.DeviceStatus{}
+	//current := &v1alpha2.DeviceStatus{}
+	current := &DeviceTransmitMsg{}
 	if err := json.Unmarshal(msg.Payload(), current); err != nil {
 		fmt.Printf("unmarshl receive msg DeviceTwinUpdate{} to error %v\n", err)
 		return
 	}
-	for _, twin := range current.Twins {
+	fmt.Printf("hhhhhhh")
+	fmt.Printf("revceive msg is %v", current)
+	twins := []v1alpha2.Twin{}
+	if !reflect.DeepEqual(current.DeviceAdded, v1alpha2.Device{}) {
+		twins = current.DeviceAdded.Status.Twins
+	} else if !reflect.DeepEqual(current.DeviceUpdated, v1alpha2.Device{}) {
+		twins = current.DeviceUpdated.Status.Twins
+	} else if !reflect.DeepEqual(current.DeviceUpdated, v1alpha2.Device{}) {
+		twins = current.DeviceRemoved.Status.Twins
+	}
+	fmt.Printf("after parsed, twins become %v", twins)
+	for _, twin := range twins {
 		if twin.PropertyName == RED_STATE {
 			value := twin.Desired.Value
+			fmt.Printf("red value is %s", value)
 			if LedState(red_wpi_num) != value {
 				if err := Set(red_wpi_num, value); err != nil {
 					fmt.Printf("Set Red light to %v error %v", value, err)
@@ -152,6 +177,7 @@ func OperateUpdateDetalSub(c MQTT.Client, msg MQTT.Message) {
 			}
 		} else if twin.PropertyName == YELLOW_STATE {
 			value := twin.Desired.Value
+			fmt.Printf("yellow value is %s", value)
 			if LedState(yellow_wpi_num) != value {
 				if err := Set(yellow_wpi_num, value); err != nil {
 					fmt.Printf("Set Yellow light to %v error %v", value, err)
@@ -159,6 +185,7 @@ func OperateUpdateDetalSub(c MQTT.Client, msg MQTT.Message) {
 			}
 		} else if twin.PropertyName == GREEN_STATE {
 			value := twin.Desired.Value
+			fmt.Printf("green value is %s", value)
 			if LedState(green_wpi_num) != value {
 				if err := Set(green_wpi_num, value); err != nil {
 					fmt.Printf("Set Green light to %v error %v", value, err)
