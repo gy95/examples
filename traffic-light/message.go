@@ -157,17 +157,37 @@ func OperateUpdateDetalSub(c MQTT.Client, msg MQTT.Message) {
 		fmt.Println("unmarshl receive msg DeviceTwinUpdate{} to error %v\n", err)
 		return
 	}
-	fmt.Println("hhhhhhh")
-	fmt.Println("revceive msg is %v", current)
+	//fmt.Println("hhhhhhh")
+	//fmt.Println("revceive msg is %v", current)
 	twins := []v1alpha2.Twin{}
+	if !reflect.DeepEqual(&current.DeviceAdded, &v1alpha2.Device{}) {
+		twins = current.DeviceAdded.Status.Twins
+		fmt.Println("added twin")
+	} else if !reflect.DeepEqual(&current.DeviceUpdated, &v1alpha2.Device{}) {
+		twins = current.DeviceUpdated.Status.Twins
+		fmt.Println("update twin")
+	} else if !reflect.DeepEqual(&current.DeviceRemoved, &v1alpha2.Device{}) {
+		twins = current.DeviceRemoved.Status.Twins
+		fmt.Println("delete twin")
+	}
+
 	if !reflect.DeepEqual(current.DeviceAdded, v1alpha2.Device{}) {
 		twins = current.DeviceAdded.Status.Twins
+		fmt.Println("added twin hhhhhhh")
 	} else if !reflect.DeepEqual(current.DeviceUpdated, v1alpha2.Device{}) {
 		twins = current.DeviceUpdated.Status.Twins
-	} else if !reflect.DeepEqual(current.DeviceUpdated, v1alpha2.Device{}) {
+		fmt.Println("update twin hhhhhhhhhhh")
+	} else if !reflect.DeepEqual(current.DeviceRemoved, v1alpha2.Device{}) {
 		twins = current.DeviceRemoved.Status.Twins
+		fmt.Println("delete twin hhhhhhhhhhhhhhhh")
 	}
+
+	fmt.Println("current.DeviceAdded is : ", current.DeviceAdded)
+	fmt.Println("current.DeviceUpdated is : ", current.DeviceUpdated)
+	fmt.Println("current.DeviceRemoved is : ", current.DeviceRemoved)
+	fmt.Println("--------------------------------------------")
 	fmt.Println("after parsed, twins become %v", twins)
+	fmt.Println("--------------------------------------------")
 	for _, twin := range twins {
 		if twin.PropertyName == RED_STATE {
 			value := twin.Desired.Value
