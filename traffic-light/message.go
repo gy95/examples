@@ -157,7 +157,7 @@ func OperateUpdateDetalSub(c MQTT.Client, msg MQTT.Message) {
 
 	fmt.Println("current is ", current)
 	value := current.Twin[RED_STATE].Desired.Value
-	fmt.Println("red value is %s", value)
+	fmt.Println("red value is last now ",LedState(red_wpi_num), value)
 	if LedState(red_wpi_num) != value {
 		if err := Set(red_wpi_num, value); err != nil {
 			fmt.Println("Set Red light to %v error %v", value, err)
@@ -165,15 +165,14 @@ func OperateUpdateDetalSub(c MQTT.Client, msg MQTT.Message) {
 	}
 
 	value = current.Twin[YELLOW_STATE].Desired.Value
-	fmt.Println("yellow value is %s", value)
+	fmt.Println("yellow value is last now ",LedState(yellow_wpi_num), value)
 	if LedState(yellow_wpi_num) != value {
 		if err := Set(yellow_wpi_num, value); err != nil {
 			fmt.Println("Set Yellow light to %v error %v", value, err)
 		}
 	}
 
-	value = current.Twin[GREEN_STATE].Desired.Value
-	fmt.Println("green value is %s", value)
+	fmt.Println("green  value is last now ",LedState(green_wpi_num), value)
 	if LedState(green_wpi_num) != value {
 		if err := Set(green_wpi_num, value); err != nil {
 			fmt.Println("Set Green light to %v error %v", value, err)
