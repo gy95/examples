@@ -214,7 +214,8 @@ func LedState(number int64) string {
 func UpdateActualDeviceStatus() {
 	//r .y. g
 
-	deviceTwinUpdate := DeviceETPrefix + deviceID + TwinETUpdateSuffix
+	// topic contains namespace
+	deviceTwinUpdate := DeviceETPrefix + "default/" + deviceID + TwinETUpdateSuffix
 	for {
 		act := CreateActualDeviceStatus(LedState(red_wpi_num), LedState(yellow_wpi_num), LedState(green_wpi_num))
 
@@ -231,7 +232,7 @@ func UpdateActualDeviceStatus() {
 
 		//fmt.Println("update deviceTwin %++v\n", string(twinUpdateBody))
 
-		time.Sleep(time.Second * 3000)
+		time.Sleep(time.Second * 30)
 	}
 
 }
