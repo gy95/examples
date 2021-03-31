@@ -125,7 +125,9 @@ func InitCLient() MQTT.Client {
 		opts := MQTT.NewClientOptions().AddBroker(mqtturl).SetClientID("zhangjie-test").SetCleanSession(false)
 		opts = opts.SetKeepAlive(10)
 		opts = opts.SetOnConnectHandler(func(c MQTT.Client) {
-			topic := DeviceETPrefix + deviceID + TwinETUpdateDetalSuffix
+			//topic := DeviceETPrefix + deviceID + TwinETUpdateDetalSuffix
+			topic := DeviceETPrefix + "default" + "/" + deviceID + TwinETUpdateDetalSuffix
+			fmt.Printf("deviceID is %s", deviceID)
 			if token := c.Subscribe(topic, 0, OperateUpdateDetalSub); token.Wait() && token.Error() != nil {
 				fmt.Println("subscribe: ", token.Error())
 				os.Exit(1)
