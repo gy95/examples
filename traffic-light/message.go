@@ -16,8 +16,6 @@ import (
 	"github.com/kubeedge/kubeedge/cloud/pkg/devicecontroller/types"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
-
-	"github.com/kubeedge/kubeedge/edge/pkg/devicetwin/dttype"
 )
 
 //var deviceID string = "traffic-light-instance-01"
@@ -180,20 +178,41 @@ func OperateUpdateDetalSub(c MQTT.Client, msg MQTT.Message) {
 	}
 }
 
-func CreateActualDeviceStatus(actred, actyellow, actgreen string) dttype.DeviceTwinUpdate {
-	act := dttype.DeviceTwinUpdate{}
-	actualMap := map[string]*dttype.MsgTwin{
-		RED_STATE: {
-			Actual:   &dttype.TwinValue{Value: &actred},
-			Metadata: &dttype.TypeMetadata{Type: "Updated"}},
-		YELLOW_STATE: {
-			Actual:   &dttype.TwinValue{Value: &actyellow},
-			Metadata: &dttype.TypeMetadata{Type: "Updated"}},
-		GREEN_STATE: {
-			Actual:   &dttype.TwinValue{Value: &actgreen},
-			Metadata: &dttype.TypeMetadata{Type: "Updated"}},
+func CreateActualDeviceStatus(actred, actyellow, actgreen string) v1alpha2.Device {
+	// 设备侧和边缘侧通信使用K8s统一结构体
+	act := v1alpha2.Device{}
+	//actualMap := map[string]*dttype.MsgTwin{
+	//	RED_STATE: {
+	//		Actual:   &dttype.TwinValue{Value: &actred},
+	//		Metadata: &dttype.TypeMetadata{Type: "Updated"}},
+	//	YELLOW_STATE: {
+	//		Actual:   &dttype.TwinValue{Value: &actyellow},
+	//		Metadata: &dttype.TypeMetadata{Type: "Updated"}},
+	//	GREEN_STATE: {
+	//		Actual:   &dttype.TwinValue{Value: &actgreen},
+	//		Metadata: &dttype.TypeMetadata{Type: "Updated"}},
+	//}
+	twin := []v1alpha2.Twin{
+		{
+			PropertyName: RED_STATE,
+			Reported: v1alpha2.TwinProperty{
+				Value: actred,
+			},
+		},
+		{
+			PropertyName: YELLOW_STATE,
+			Reported: v1alpha2.TwinProperty{
+				Value: actyellow,
+			},
+		},
+		{
+			PropertyName: GREEN_STATE,
+			Reported: v1alpha2.TwinProperty{
+				Value: actgreen,
+			},
+		},
 	}
-	act.Twin = actualMap
+	act.Status.Twins = twin
 	return act
 }
 
