@@ -146,34 +146,40 @@ func OperateUpdateDetalSub(c MQTT.Client, msg MQTT.Message) {
 	fmt.Println("Receive msg topic %s %v\n\n", msg.Topic(), string(msg.Payload()))
 	// current := &dttype.DeviceTwinUpdate{}
 
-	current := &DeviceTwinDelta{}
+	current := &v1alpha2.Device{}
 	//current := &DeviceTransmitMsg{}
 	if err := json.Unmarshal(msg.Payload(), current); err != nil {
 		fmt.Println("unmarshl receive msg DeviceTwinUpdate{} to error %v\n", err)
 		return
 	}
 
-	fmt.Println("current is ", current)
-	value := current.Twin[RED_STATE].Desired.Value
-	fmt.Println("red value is last now ",LedState(red_wpi_num), value)
-	if LedState(red_wpi_num) != value {
-		if err := Set(red_wpi_num, value); err != nil {
-			fmt.Println("Set Red light to %v error %v", value, err)
+	for _, twin := range current.Status.Twins {
+		if twin.PropertyName == RED_STATE {
+			value := twin.Desired.Value
+			fmt.Println("red value is last : now ",LedState(red_wpi_num), value)
+			if LedState(red_wpi_num) != value {
+				if err := Set(red_wpi_num, value); err != nil {
+					fmt.Println("Set Red light to %v error %v", value, err)
+				}
+			}
 		}
-	}
-
-	value = current.Twin[YELLOW_STATE].Desired.Value
-	fmt.Println("yellow value is last now ",LedState(yellow_wpi_num), value)
-	if LedState(yellow_wpi_num) != value {
-		if err := Set(yellow_wpi_num, value); err != nil {
-			fmt.Println("Set Yellow light to %v error %v", value, err)
+		if twin.PropertyName == YELLOW_STATE {
+			value := twin.Desired.Value
+			fmt.Println("yellow value is last now ",LedState(yellow_wpi_num), value)
+			if LedState(yellow_wpi_num) != value {
+				if err := Set(yellow_wpi_num, value); err != nil {
+					fmt.Println("Set Yellow light to %v error %v", value, err)
+				}
+			}
 		}
-	}
-
-	fmt.Println("green  value is last now ",LedState(green_wpi_num), value)
-	if LedState(green_wpi_num) != value {
-		if err := Set(green_wpi_num, value); err != nil {
-			fmt.Println("Set Green light to %v error %v", value, err)
+		if twin.PropertyName == GREEN_STATE {
+			value := twin.Desired.Value
+			fmt.Println("green  value is last now ",LedState(green_wpi_num), value)
+			if LedState(green_wpi_num) != value {
+				if err := Set(green_wpi_num, value); err != nil {
+					fmt.Println("Set Green light to %v error %v", value, err)
+				}
+			}
 		}
 	}
 }
