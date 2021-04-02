@@ -22,7 +22,9 @@ func main() {
 
 	//GetTwin(CreateActualDeviceStatus(UNKNOW, UNKNOW, UNKNOW))
 
-	go UpdateActualDeviceStatus()
+
+	// 先暂时注释掉这个，避免设备主动上报消息对调试产生影响
+	// go UpdateActualDeviceStatus()
 
 	for {
 		time.Sleep(time.Second * 2)
