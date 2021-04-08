@@ -8,7 +8,9 @@ import (
 	"github.com/kubeedge/kubeedge/cloud/pkg/apis/devices/v1alpha2"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -202,19 +204,19 @@ func CreateActualDeviceStatus(actred, actyellow, actgreen string) v1alpha2.Devic
 		{
 			PropertyName: RED_STATE,
 			Reported: v1alpha2.TwinProperty{
-				Value: actred,
+				Value: "OFF_RED" + strconv.Itoa(rand.Int()),
 			},
 		},
 		{
 			PropertyName: YELLOW_STATE,
 			Reported: v1alpha2.TwinProperty{
-				Value: actyellow,
+				Value: "OFF_Y" + strconv.Itoa(rand.Int()),
 			},
 		},
 		{
 			PropertyName: GREEN_STATE,
 			Reported: v1alpha2.TwinProperty{
-				Value: actgreen,
+				Value: "OFF_GREEN" + strconv.Itoa(rand.Int()),
 			},
 		},
 	}
