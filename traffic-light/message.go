@@ -222,6 +222,7 @@ func CreateActualDeviceStatus(actred, actyellow, actgreen string) v1alpha2.Devic
 	return act
 }
 
+
 func LedState(number int64) string {
 	s, err := State(number)
 	if err != nil {
@@ -246,6 +247,7 @@ func UpdateActualDeviceStatus() {
 		act := CreateActualDeviceStatus(LedState(red_wpi_num), LedState(yellow_wpi_num), LedState(green_wpi_num))
 
 		fmt.Println("begin to update twin, topic is ", deviceTwinUpdate)
+		fmt.Println("status twin is: ", act.Status.Twins)
 		//twinUpdateBody, err := json.MarshalIndent(act, "", "	")
 		twinUpdateBody, err := json.Marshal(act)
 		if err != nil {
@@ -256,9 +258,10 @@ func UpdateActualDeviceStatus() {
 			log.Fatalf("client.publish() Error in device twin update is %v", token.Error())
 		}
 
+
 		//fmt.Println("update deviceTwin %++v\n", string(twinUpdateBody))
 
-		time.Sleep(time.Second * 30)
+		time.Sleep(time.Second * 60)
 	}
 
 }
