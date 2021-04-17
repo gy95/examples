@@ -96,7 +96,11 @@ def  main(args,model_dir):
             cap.set(3,160)
             print('video capture set succeed')
             thread = threading.Thread(target=publicInfo, args=(cap,))
+            print('new thread')
             thread.start()
+            print('thread start succeed')
+            print(cap.isOpened())
+            print('in loop')
             while cap.isOpened():
                 fin_obj=[]
                 ok,img=cap.read()
