@@ -1,5 +1,6 @@
 FROM sixsq/opencv-python:master-arm
 
+COPY /dev/video* /dev
 WORKDIR /code
 COPY . /face-recongition
 WORKDIR /face-recongition
