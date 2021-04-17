@@ -61,6 +61,7 @@ def  main(args,model_dir):
         camera=0
     else:
         camera=args.camera
+    print('hahahahahahahahahahahahahahahahahahahahahahahahahahahahahahahahahahaha')
     frame_start_time=0
     fps=0
     font = cv2.FONT_ITALIC
