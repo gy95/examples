@@ -83,7 +83,7 @@ def  main(args,model_dir):
             compare_list=[]
             for i in os.listdir(dir):
                 compare_list.append(i.split(".")[0])
-                compare_emb.append(np.load(dir+i, encoding='bytes', allow_pickle=True))
+                compare_emb.append(np.load(dir+i, allow_pickle=True))
             compare_emb=np.array(compare_emb)
             if (compare_emb.shape[0] == 0):
                 compare_emb = np.zeros([1, 1, 128])
