@@ -96,9 +96,11 @@ def  main(args,model_dir):
                 compare_emb = np.zeros([1, 1, 128])
                 self.compare_list.append("unknown")
             print(self.compare_emb.shape)
-
+            print('begin video capture')
             cap = cv2.VideoCapture(camera)
+            print('video capture succeed')
             cap.set(3,160)
+            print('video capture set succeed')
             thread = threading.Thread(target=publicInfo, args=(cap,))
             thread.start()
             while cap.isOpened():
