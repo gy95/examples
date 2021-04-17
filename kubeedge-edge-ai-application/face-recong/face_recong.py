@@ -101,6 +101,10 @@ def  main(args,model_dir):
             print('thread start succeed')
             print(cap.isOpened())
             print('in loop')
+            cap.Open()
+            print('after run Open')
+            print(cap.isOpened())
+            print('after run Open')
             while cap.isOpened():
                 fin_obj=[]
                 ok,img=cap.read()
