@@ -78,24 +78,18 @@ def  main(args,model_dir):
             embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
             phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
             #读取people中的数据
-            dir='people/'
+            dir="people/"
+            compare_emb=[]
+            compare_list=[]
             for i in os.listdir(dir):
-                image_url=dir+i
-                self.compare_list.append(i.split(".")[0])
-                img=cv2.imread(image_url,1)
-
-                image = cv2.resize(img, (0, 0), fx=0.5, fy=0.5, interpolation=cv2.INTER_NEAREST)
-                gray = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                mark, bounding_box, crop_image = self.load_and_align_data(gray, 160, 44)
-                if mark:
-                    feed_dict = {self.images_placeholder: crop_image, self.phase_train_placeholder: False}
-                    emb = self.sess.run(self.embeddings, feed_dict=feed_dict)
-                self.compare_emb.append(emb)
-            self.compare_emb = np.array(self.compare_emb)
-            if (self.compare_emb.shape[0] == 0):
+                compare_list.append(i.split(".")[0])
+                compare_emb.append(np.load(dir+i))
+            compare_emb=np.array(compare_emb)
+            if (compare_emb.shape[0] == 0):
                 compare_emb = np.zeros([1, 1, 128])
-                self.compare_list.append("unknown")
-            print(self.compare_emb.shape)
+                compare_list.append("unknown")
+            print( compare_emb.shape)
+
             print('begin video capture')
             cap = cv2.VideoCapture(camera)
             print('video capture succeed')
