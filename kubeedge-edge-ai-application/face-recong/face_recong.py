@@ -90,22 +90,12 @@ def  main(args,model_dir):
                 compare_list.append("unknown")
             print( compare_emb.shape)
 
-            print('begin video capture')
-            cap = cv2.VideoCapture(camera)
-            print('video capture succeed')
+            print(camera)
+            cap = cv2.VideoCapture(0)
             cap.set(3,160)
-            print('video capture set succeed')
             thread = threading.Thread(target=publicInfo, args=(cap,))
-            print('new thread')
             thread.start()
-            print('thread start succeed')
-            print(cap.isOpened())
-            print('in loop')
-            cap.open()
-            print('after run Open')
-            print(cap.isOpened())
-            print('after run Open')
-            while cap.isOpened():
+            while True:
                 fin_obj=[]
                 ok,img=cap.read()
                 image=cv2.resize(img, (0, 0), fx=0.5, fy=0.5, interpolation=cv2.INTER_NEAREST)
