@@ -101,7 +101,7 @@ def  main(args,model_dir):
             print('thread start succeed')
             print(cap.isOpened())
             print('in loop')
-            cap.Open()
+            cap.open()
             print('after run Open')
             print(cap.isOpened())
             print('after run Open')
