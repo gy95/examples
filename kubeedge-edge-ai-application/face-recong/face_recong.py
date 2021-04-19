@@ -91,10 +91,12 @@ def  main(args,model_dir):
             print( compare_emb.shape)
 
             print(camera)
-            cap = cv2.VideoCapture(0)
+            cap = cv2.VideoCapture(camera)
             cap.set(3,160)
             thread = threading.Thread(target=publicInfo, args=(cap,))
             thread.start()
+            print('camera is open or not')
+            print(cap.isOpened())
             while True:
                 fin_obj=[]
                 ok,img=cap.read()
