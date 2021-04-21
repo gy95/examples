@@ -196,13 +196,14 @@ func OperateUpdateDetalSub(c MQTT.Client, msg MQTT.Message) {
 }
 
 func GetTwinSub(c MQTT.Client, msg MQTT.Message) {
-	fmt.Println("Receive msg topic %s %v\n\n", msg.Topic(), string(msg.Payload()))
+	fmt.Println("Receive msg topic %s", msg.Topic())
+	fmt.Println("Receive msg topic %v", string(msg.Payload()))
 	// current := &dttype.DeviceTwinUpdate{}
 
 	current := &v1alpha2.Device{}
 	//current := &DeviceTransmitMsg{}
 	if err := json.Unmarshal(msg.Payload(), current); err != nil {
-		fmt.Println("unmarshl receive msg DeviceTwinUpdate{} to error %v\n", err)
+		fmt.Println("unmarshl receive msg device{} to error %v\n", err)
 		return
 	}
 	fmt.Printf("receive twin is %v", current.Status.Twins)
