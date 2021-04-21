@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/kubeedge/kubeedge/cloud/pkg/apis/devices/v1alpha2"
+	"log"
 	"os"
 	"time"
+	"encoding/json"
 )
 
 func main() {
@@ -25,6 +28,27 @@ func main() {
 
 	// 先暂时注释掉这个，避免设备主动上报消息对调试产生影响
 	go UpdateActualDeviceStatus()
+
+	// twin get
+	go func() {
+		topic := DeviceETPrefix +  "default/" + deviceID + TwinETGetSuffix
+		device := v1alpha2.Device{}
+		for {
+			fmt.Println("begin to update twin, topic is ", topic)
+			twinGetBody, err := json.Marshal(device)
+			if err != nil {
+				log.Fatalf("Error:  %v", err)
+			}
+			token := Client.Publish(topic, 1, false, twinGetBody)
+			if token.Wait() && token.Error() != nil {
+				log.Fatalf("client.publish() Error in device twin update is %v", token.Error())
+			}
+			
+			//fmt.Println("update deviceTwin %++v\n", string(twinUpdateBody))
+
+			time.Sleep(time.Second * 60)
+		}
+	}()
 
 	for {
 		time.Sleep(time.Second * 2)

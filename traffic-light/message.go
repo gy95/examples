@@ -132,6 +132,15 @@ func InitCLient() MQTT.Client {
 				os.Exit(1)
 			}
 		})
+		opts = opts.SetOnConnectHandler(func(c MQTT.Client) {
+			//topic := DeviceETPrefix + deviceID + TwinETUpdateDetalSuffix
+			topic := DeviceETPrefix + "default" + "/" + deviceID + TwinETGetResultSuffix
+			fmt.Println("deviceID is %s, topic is %s", deviceID, topic)
+			if token := c.Subscribe(topic, 0, GetTwinSub); token.Wait() && token.Error() != nil {
+				fmt.Println("subscribe: ", token.Error())
+				os.Exit(1)
+			}
+		})
 		Client = MQTT.NewClient(opts)
 	})
 	return Client
@@ -184,6 +193,19 @@ func OperateUpdateDetalSub(c MQTT.Client, msg MQTT.Message) {
 			}
 		}
 	}
+}
+
+func GetTwinSub(c MQTT.Client, msg MQTT.Message) {
+	fmt.Println("Receive msg topic %s %v\n\n", msg.Topic(), string(msg.Payload()))
+	// current := &dttype.DeviceTwinUpdate{}
+
+	current := &v1alpha2.Device{}
+	//current := &DeviceTransmitMsg{}
+	if err := json.Unmarshal(msg.Payload(), current); err != nil {
+		fmt.Println("unmarshl receive msg DeviceTwinUpdate{} to error %v\n", err)
+		return
+	}
+	fmt.Printf("receive twin is %v", current.Status.Twins)
 }
 
 func CreateActualDeviceStatus(actred, actyellow, actgreen string) v1alpha2.Device {
