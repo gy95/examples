@@ -1,0 +1,14 @@
+apiVersion: devices.kubeedge.io/v1alpha2
+kind: DeviceModel
+metadata:
+  name: light
+  namespace: default
+spec:
+  properties:
+    - name: color
+      description: Indicates the light color
+      type:
+        string:
+          accessMode: ReadWrite
+          defaultValue: ''
+

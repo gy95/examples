@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: light
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: light
+  template:
+    metadata:
+      labels:
+        app: light
+    spec:
+      hostNetwork: true
+      containers:
+      - name: light
+        image: guoyao95/light:v1.0.0
+        command: ["/light/light"]
+        args: ["--device=light01"]
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/kubeedge/
+        - name: result-volume
+          mountPath: /result/
+      volumes:
+      - name: config-volume
+        configMap:
+          name: device-profile-config-edge-node
+      - name: result-volume
+        hostPath:
+          path: /tmp
+          type: Directory
+      restartPolicy: Always

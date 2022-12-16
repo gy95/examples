@@ -1,0 +1,30 @@
+apiVersion: devices.kubeedge.io/v1alpha2
+kind: Device
+metadata:
+  name: light01
+  labels:
+    description: Light
+    model: light
+spec:
+  deviceModelRef:
+    name: light
+  nodeSelector:
+    nodeSelectorTerms:
+      - matchExpressions:
+          - key: ''
+            operator: In
+            values:
+              - edge-node # give your edge node name
+status:
+  twins:
+    - desired:
+        metadata:
+          type: string
+        value: "Red"
+      propertyName: color
+      reported:
+        metadata:
+          timestamp: "1576146376369"
+          type: string
+        value: "Green"
+
